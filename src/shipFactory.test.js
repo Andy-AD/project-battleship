@@ -1,7 +1,7 @@
-import shipFactory from "./shipFactory";
+import Ship from "./shipFactory";
 
 describe("new ship", () => {
-  let newShip = shipFactory(3);
+  let newShip = Ship(3);
   test("length equals 3", () => {
     expect(newShip.length).toBe(3);
   });

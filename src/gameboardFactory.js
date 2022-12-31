@@ -2,7 +2,9 @@ import Ship from "./shipFactory";
 
 export default function Gameboard() {
   let board = createGameboard();
-
+  let hitShots = [];
+  let missedShots = [];
+  let ships = [];
   const placeShip = (coordinate, allignment, ship) => {
     let [row, column] = splitCoordinates(coordinate);
     row = Number(row);
@@ -15,12 +17,37 @@ export default function Gameboard() {
         row++;
       }
     }
+    ships.push(ship);
     return true;
+  };
+
+  const receiveAttack = (coordinate) => {
+    let [row, column] = splitCoordinates(coordinate);
+    row = Number(row);
+    if (attackIsDuplicate(coordinate, missedShots, hitShots)) {
+      return "duplicate attack";
+    }
+    if (board[row][column]) {
+      let ship = board[row][column];
+      ship.hit();
+      hitShots.push(coordinate);
+      return "hit";
+    }
+    missedShots.push(coordinate);
+    return "missed";
+  };
+
+  const isAllShipsSunk = () => {
+    let numberOfShipsSunk = 0;
+    ships.forEach((ship) => {
+      if (ship.isSunk()) numberOfShipsSunk++;
+    });
+    return numberOfShipsSunk === ships.length;
   };
 
   const getBoard = () => board;
 
-  return { getBoard, placeShip };
+  return { getBoard, placeShip, receiveAttack, isAllShipsSunk };
 }
 
 function createGameboard() {
@@ -77,4 +104,11 @@ function isValidCoordinate(row, column, board) {
     });
   });
   return isValid;
+}
+
+function attackIsDuplicate(coordinate, missedShots, hitShots) {
+  if (missedShots.includes(coordinate) || hitShots.includes(coordinate)) {
+    return true;
+  }
+  return false;
 }

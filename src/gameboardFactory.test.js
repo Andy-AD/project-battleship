@@ -4,6 +4,10 @@ import Ship from "./shipFactory";
 describe("Gameboard tests", () => {
   let newGameboard = Gameboard();
   let board = newGameboard.getBoard();
+  let newShip = Ship(1);
+  let newShip2 = Ship(4);
+  let newShip3 = Ship(2);
+  let newShip4 = Ship(1);
   test("board has 10 rows", () => {
     expect(Object.keys(board).length).toBe(10);
   });
@@ -18,7 +22,7 @@ describe("Gameboard tests", () => {
   test("board row 0 to be undefined", () => {
     expect(board[0]).toBeUndefined();
   });
-  let newShip = Ship(1);
+
   test("place ship at 1 a with length 1 horizontally to equal true", () => {
     expect(newGameboard.placeShip("1a", "horizontal", newShip)).toBe(true);
   });
@@ -26,7 +30,7 @@ describe("Gameboard tests", () => {
     let updatedBoard = newGameboard.getBoard();
     expect(updatedBoard[1].A).toStrictEqual(newShip);
   });
-  let newShip2 = Ship(4);
+
   test("place ship at 5 a with length 4 vertically to equal true", () => {
     expect(newGameboard.placeShip("5a", "vertical", newShip2)).toBe(true);
   });
@@ -34,7 +38,7 @@ describe("Gameboard tests", () => {
     let updatedBoard = newGameboard.getBoard();
     expect(updatedBoard[8].A).toBe(newShip2);
   });
-  let newShip3 = Ship(2);
+
   test("place ship at 2 H with length 2 horizontal to equal true", () => {
     expect(newGameboard.placeShip("2h", "horizontal", newShip3)).toBe(true);
   });
@@ -42,16 +46,33 @@ describe("Gameboard tests", () => {
     let updatedBoard = newGameboard.getBoard();
     expect(updatedBoard[2].I).toBe(newShip3);
   });
-  let newShip4 = Ship(1);
   test("placing ship on coordinate which has ship should return false", () => {
     expect(newGameboard.placeShip("2h", "horizontal", newShip4)).toBe(false);
   });
   test("placing ship on  adjacent coordinate which has ship should return false", () => {
     expect(newGameboard.placeShip("1j", "horizontal", newShip4)).toBe(false);
   });
-  test("checking board", () => {
-    let updatedBoard = newGameboard.getBoard();
-    expect(updatedBoard).toBe(newShip3);
+  test("attack ship on 2 I should return 'hit'", () => {
+    expect(newGameboard.receiveAttack("2i")).toBe("hit");
   });
-
+  test("attack ship on 1 A should return 'hit'", () => {
+    expect(newGameboard.receiveAttack("1a")).toBe("hit");
+  });
+  test("attack ship on 1 B should return 'missed'", () => {
+    expect(newGameboard.receiveAttack("1b")).toBe("missed");
+  });
+  test("attack ship on 1 A should return 'duplicate attack'", () => {
+    expect(newGameboard.receiveAttack("1a")).toBe("duplicate attack");
+  });
+  test("check if all ships sunk should return false", () => {
+    expect(newGameboard.isAllShipsSunk()).toBeFalsy();
+  });
+  test("check if all ships sunk should return true", () => {
+    newGameboard.receiveAttack("2h");
+    newGameboard.receiveAttack("5a");
+    newGameboard.receiveAttack("6a");
+    newGameboard.receiveAttack("7a");
+    newGameboard.receiveAttack("8a");
+    expect(newGameboard.isAllShipsSunk()).toBeTruthy();
+  });
 });
